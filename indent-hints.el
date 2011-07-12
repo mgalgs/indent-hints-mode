@@ -61,16 +61,33 @@
                (setq current-line-number (1+ current-line-number))
                (next-line)
                ) ;; eo while
-             ; (message "%d start with tabs, %d start with spaces, %d with something else" begin-with-tab begin-with-space begin-with-something-else)
+             (message "%d start with tabs, %d start with spaces, %d with something else" begin-with-tab begin-with-space begin-with-something-else)
              (if (> begin-with-space begin-with-tab)
-                 (message "Looks like this buffer is space-loving")
-               (message "Looks like this buffer is tab-loving"))
+                 (update-indent-hints-mode-line "Space")
+               (update-indent-hints-mode-line "Tab")
+               )
              ) ;; eo let
            ) ;; eo save-excursion
-         ) ;; eo indent-hints-mode
+         ) ;; eo cond indent-hints-mode
         (t
          (message "indent-hints-mode disabled!")))) ;; eo cond, define-minor-mode
 
-(provide 'indent-hints-mode)
+;;; Helper functions
+;;
+(defun update-indent-hints-mode-line (what-this-buffer-loves)
+  (let ((indent-hints-mode-line-text (concat " " "[" what-this-buffer-loves "-loving" "]"))
+        (my-mode-line-buffer-identification
+         (remq " [Tab-loving]" (remq " [Space-loving]" mode-line-buffer-identification))))
+    (setq mode-line-buffer-identification
+          (add-to-list 'my-mode-line-buffer-identification
+                       indent-hints-mode-line-text
+                       t))
+    (force-mode-line-update)))
+
+;; (let ((pos (memq 'mode-line-modes mode-line-format)))
+;;   (setcdr pos (cons "Space Loving--" (cdr pos)))
+;;   (message "Looks like this buffer is space-loving"))
+
+(provide 'indent-hints)
 ;;; indent-hints.el ends here
 ;;
