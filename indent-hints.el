@@ -34,18 +34,34 @@
 ;; 
 ;;; Installation:
 ;; 
-;; TODO
+;; o Put indent-hints.el in your load path
+;; o add the following line to your .emacs file:
+;;     (require 'indent-hints)
+;; 
+;; You can then activate indent-hints mode in a buffer the usual way:
+;;     (indent-hints-mode)
+;; 
+;; You can also use the globalized minor mode to enable
+;; indent-hints-mode in all buffers:
+;;     (indent-hints-global-mode)
 ;; 
 ;;; Use:
 ;; 
-;; TODO
+;; Look at your mode-line to see whether the buffer you're visiting is
+;; space-loving or tab-loving.
+;; 
+;; TODO:
+;; 
+;; o Add some helper functions to switch between tabs/spaces profiles.
+;; o Actually disable the mode (clean up the minor-mode-alist) on disable.
 ;; 
 ;;; Code
 
 (define-minor-mode indent-hints-mode
   "Give user hints about whether this buffer is space- or tab-loving."
-  nil " indent-hints" nil
+  nil "" nil
   (cond (indent-hints-mode
+         (message "processing indentation hints for buffer %s" (buffer-name))
          (save-excursion
            (let ((begin-with-tab 0)
                  (begin-with-space 0)
@@ -59,34 +75,50 @@
                       (setq begin-with-tab (1+ begin-with-tab)))
                      (t (setq begin-with-something-else (1+ begin-with-something-else))))
                (setq current-line-number (1+ current-line-number))
-               (next-line)
+               (forward-line 1)
                ) ;; eo while
              (message "%d start with tabs, %d start with spaces, %d with something else" begin-with-tab begin-with-space begin-with-something-else)
              (if (> begin-with-space begin-with-tab)
-                 (update-indent-hints-mode-line "Space")
-               (update-indent-hints-mode-line "Tab")
-               )
+                 (setq space-loving t tab-loving nil)
+               (setq tab-loving t space-loving nil))
              ) ;; eo let
            ) ;; eo save-excursion
          ) ;; eo cond indent-hints-mode
         (t
+         (setq space-loving nil tab-loving nil)
          (message "indent-hints-mode disabled!")))) ;; eo cond, define-minor-mode
+
+
 
 ;;; Helper functions
 ;;
-(defun update-indent-hints-mode-line (what-this-buffer-loves)
-  (let ((indent-hints-mode-line-text (concat " " "[" what-this-buffer-loves "-loving" "]"))
-        (my-mode-line-buffer-identification
-         (remq " [Tab-loving]" (remq " [Space-loving]" mode-line-buffer-identification))))
-    (setq mode-line-buffer-identification
-          (add-to-list 'my-mode-line-buffer-identification
-                       indent-hints-mode-line-text
-                       t))
-    (force-mode-line-update)))
 
-;; (let ((pos (memq 'mode-line-modes mode-line-format)))
-;;   (setcdr pos (cons "Space Loving--" (cdr pos)))
-;;   (message "Looks like this buffer is space-loving"))
+;; global variable to keep track of whether or not we've done global
+;; activation of indent-hints-mode:
+(setq indent-hints-did-global-activation nil)
+
+(defun indent-hints-global-activate ()
+  "Sets up the minor-mode-alist and buffer-local variable for indentation hints"
+  (message "doing global-activate globact: %S" indent-hints-did-global-activation)
+  (setq minor-mode-alist (cons '(space-loving " [Space-loving]")
+                               (cons '(tab-loving " [Tab-loving]")
+                                     minor-mode-alist)))
+  (setq string-loving nil tab-loving nil)
+  (make-variable-buffer-local 'space-loving)
+  (make-variable-buffer-local 'tab-loving)
+  (setq indent-hints-did-global-activation t))
+
+
+(defun indent-hints-mode-on ()
+  "Turns on indent-hints-mode, if appropriate.
+This function is intended to be used with define-globalized-minor-mode"
+  (unless indent-hints-did-global-activation (indent-hints-global-activate))
+  (unless (or indent-hints-mode (minibufferp))
+    (indent-hints-mode 1)))
+
+(define-globalized-minor-mode indent-hints-global-mode indent-hints-mode indent-hints-mode-on
+  :group 'indent-hints
+  :require 'indent-hints)
 
 (provide 'indent-hints)
 ;;; indent-hints.el ends here
