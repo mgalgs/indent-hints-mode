@@ -77,10 +77,15 @@
                (setq current-line-number (1+ current-line-number))
                (forward-line 1)
                ) ;; eo while
-             (message "%d start with tabs, %d start with spaces, %d with something else" begin-with-tab begin-with-space begin-with-something-else)
+             (message "%s: %d lines, %d start with tabs, %d start with spaces"
+                      (buffer-name) begin-with-something-else begin-with-tab begin-with-space)
              (if (> begin-with-space begin-with-tab)
-                 (setq space-loving t tab-loving nil)
-               (setq tab-loving t space-loving nil))
+                 (progn
+                   (setq space-loving t tab-loving nil)
+                   (update-space-loving-ratio (/ (float begin-with-space)(+ begin-with-space begin-with-tab))))
+               (progn
+                 (setq tab-loving t space-loving nil)
+                 (update-tab-loving-ratio (/ (float begin-with-tab) (+ begin-with-space begin-with-tab)))))
              ) ;; eo let
            ) ;; eo save-excursion
          ) ;; eo cond indent-hints-mode
@@ -108,6 +113,21 @@
   (make-variable-buffer-local 'tab-loving)
   (setq indent-hints-did-global-activation t))
 
+(defun update-space-loving-ratio (ratio)
+  "Update the of space-loving-ness shown in the mode line"
+  (interactive)
+  (let ((newval (concat " [Space-loving{" (format "%.2f" ratio) "}]")))
+       (setq minor-mode-alist
+             (cons (list space-loving newval)
+                   (assq-delete-all 'space-loving minor-mode-alist)))))
+
+(defun update-tab-loving-ratio (ratio)
+  "Update the of tab-loving-ness shown in the mode line"
+  (interactive)
+  (let ((newval (concat " [Tab-loving{" (format "%.2f" ratio) "}]")))
+       (setq minor-mode-alist
+             (cons (list tab-loving newval)
+                   (assq-delete-all 'tab-loving minor-mode-alist)))))
 
 (defun indent-hints-mode-on ()
   "Turns on indent-hints-mode, if appropriate.
