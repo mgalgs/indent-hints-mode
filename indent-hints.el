@@ -36,15 +36,18 @@
 ;;
 ;; o Put indent-hints.el in your load path
 ;; o add the following line to your .emacs file:
-;;     (require 'indent-hints)
+;;
+;;`     (require 'indent-hints)
 ;;
 ;; o You can then activate indent-hints mode in a buffer the usual
 ;;   way:
-;;     (indent-hints-mode)
+;;
+;;`     (indent-hints-mode)
 ;;
 ;; o You can also use the globalized minor mode to enable
 ;;   indent-hints-mode in all buffers:
-;;     (indent-hints-global-mode)
+;;
+;;`     (indent-hints-global-mode)
 ;;
 ;;; Use:
 ;;
@@ -53,7 +56,7 @@
 ;; space-to-tab (or tab-to-space, whichever your buffer loves)
 ;; loving-ness that your current buffer exudes.
 ;;
-;; TODO:
+;;; TODO:
 ;;
 ;; o Add some helper functions to switch between tabs/spaces profiles.
 ;;
