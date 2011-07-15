@@ -35,7 +35,13 @@ Use
 Just check out your mode-line to see whether the buffer you're
 visiting is space-loving or tab-loving. It also shows the ratio of
 space-to-tab (or tab-to-space, whichever your buffer loves)
-loving-ness that your current buffer exudes.
+loving-ness that your current buffer exudes. Here's a "screenshot":
+
+    `test.el Top -- (Emacs-Lisp Tab-loving:0.53 yas pair)--etc. etc.--`
+
+The file being visited in the "screenshot" has more tabs than
+spaces (53% of the lines that start with some sort of indentation
+start with tabs, to be exact).
 
 TODO
 ====
