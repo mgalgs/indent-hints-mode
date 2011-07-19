@@ -77,8 +77,10 @@
              (begin-with-space (nth 1 vals))
              (begin-with-something-else (nth 2 vals)))
         (message "%s: %d lines, %d start with tabs, %d start with spaces"
-                 (buffer-name) begin-with-something-else
-                 begin-with-tab begin-with-space)
+                 (buffer-name)
+                 (+ begin-with-something-else begin-with-tab begin-with-space)
+                 begin-with-tab
+                 begin-with-space)
         (if (> begin-with-space begin-with-tab)
             (let ((space-ratio
                    (/ (float begin-with-space) (+ begin-with-space begin-with-tab))))
