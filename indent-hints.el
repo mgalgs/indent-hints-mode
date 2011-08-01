@@ -81,26 +81,36 @@
                  (+ begin-with-something-else begin-with-tab begin-with-space)
                  begin-with-tab
                  begin-with-space)
-        (if (> begin-with-space begin-with-tab)
-            (let ((space-ratio
-                   (/ (float begin-with-space) (+ begin-with-space begin-with-tab))))
-              (setq space-loving t)
-              (setq tab-loving nil)
-              (update-space-loving-ratio space-ratio))
-          ;; else
+        (cond
+         ;; no tabs or spaces
+         ((and (= 0 begin-with-tab) (= 0 begin-with-space))
+          (setq tab-loving nil)
+          (setq space-loving nil)
+          (setq neither-loving t))
+         ;; space-loving
+         ((> begin-with-space begin-with-tab)
+          (let ((space-ratio
+                 (/ (float begin-with-space) (+ begin-with-space begin-with-tab))))
+            (setq space-loving t)
+            (setq tab-loving nil)
+            (update-space-loving-ratio space-ratio)))
+         ;; tab-loving
+         (t
           (let ((tab-ratio
                  (/ (float begin-with-tab) (+ begin-with-space begin-with-tab))))
             (setq tab-loving t)
             (setq space-loving nil)
-            (update-tab-loving-ratio tab-ratio)))) ; eo let,if,let*
+            (update-tab-loving-ratio tab-ratio))))) ; eo let,t,cond,let*
     ;; else, the mode was disabled:
     (progn
       (setq space-loving nil tab-loving nil)
       (message "indent-hints-mode disabled!"))))
 
 
+
 ;;; Helper functions
 ;;
+
 
 (defun count-line-beginnings ()
   "The real meat. Examine the first character of each line in the
@@ -138,10 +148,12 @@ num-beginning-with-something-else)"
   (message "doing global-activate globact: %S" indent-hints-did-global-activation)
   (setq minor-mode-alist (cons '(space-loving " Space-loving")
                                (cons '(tab-loving " Tab-loving")
-                                     minor-mode-alist)))
-  (setq space-loving nil tab-loving nil)
+                                     (cons '(neither-loving " Neither-loving")
+                                           minor-mode-alist))))
+  (setq space-loving nil tab-loving nil neither-loving nil)
   (make-variable-buffer-local 'space-loving)
   (make-variable-buffer-local 'tab-loving)
+  (make-variable-buffer-local 'neither-loving)
   (setq indent-hints-did-global-activation t))
 
 (setq love-sep ":")
