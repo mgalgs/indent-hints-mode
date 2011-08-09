@@ -178,7 +178,11 @@ num-beginning-with-something-else)"
   "Turns on indent-hints-mode, if appropriate.
 This function is intended to be used with define-globalized-minor-mode"
   (unless indent-hints-did-global-activation (indent-hints-global-activate))
-  (unless (or indent-hints-mode (minibufferp) (is-temp-buffer (buffer-name)))
+  (unless (or
+           indent-hints-mode
+           (minibufferp)
+           (is-temp-buffer (buffer-name))
+           (not (buffer-live-p (current-buffer))))
     (indent-hints-mode 1)))
 
 (defun is-temp-buffer (the-buffer-name)
