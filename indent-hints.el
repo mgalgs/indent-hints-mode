@@ -34,20 +34,29 @@
 ;;
 ;;; Installation:
 ;;
-;; o Put indent-hints.el in your load path
-;; o add the following line to your .emacs file:
+;; o For the impatient, here's a quick setup example (after putting
+;;   indent-hints.el in your load path):
 ;;
 ;;`     (require 'indent-hints)
-;;
-;; o You can then activate indent-hints mode in a buffer the usual
-;;   way:
-;;
-;;`     (indent-hints-mode)
-;;
-;; o You can also use the globalized minor mode to enable
-;;   indent-hints-mode in all buffers:
-;;
 ;;`     (indent-hints-global-mode)
+;;
+;;   You should probably at least customize the indent-hints-mode
+;;   group to use your preferred space/tabs setup, like so:
+;;
+;;`     M-x customize-group [RET] indent-hints [RET]
+;;
+;; o You can set up some "whitespace profiles" that get selected
+;;   automatically when a buffer is detected to be tab-loving or
+;;   space-loving. To enable this functionality, you should customize
+;;   the `indent-hints-mode` group and enable
+;;   indent-hints-enable-profile-switching-enabled, or add to your .emacs:
+;;
+;;`     (setq indent-hints-enable-profile-switching-enabled t)
+;;
+;; o You can also add your own custom functions to the hooks
+;;   `indent-hints-mode-tab-loving-hook` and
+;;   `indent-hints-mode-space-loving-hook` which run after a buffer is
+;;   detected to be tab-loving or space-loving, respectively.
 ;;
 ;;; Use:
 ;;
@@ -62,17 +71,54 @@
 ;; spaces (53% of the lines that start with some sort of indentation
 ;; start with tabs, to be exact).
 ;;
-;;; TODO:
-;;
-;; o Add some helper functions to switch between tabs/spaces profiles.
-;;
 ;;; Code
+
+(defgroup indent-hints nil
+  "Indent Hints Group"
+  :group 'convenience)
+
+;; (defcustom indent-hints-tab-loving-space-profile nil
+;;   "The profile to activate when a space-loving buffer is detected"
+;;   :type '(list :tag "How to set up spacees"
+;;                (integer :tag "c-basic-offset" :value 4)
+;;                (string :tag "c-default-style" :value "bsd"))
+;;   :group 'indent-hints)
+
+(defcustom indent-hints-enable-profile-switching-enabled nil
+  "Non-nil means switch between spacing profiles depending on the
+  tab- or space-lovingness of buffers"
+  :type 'boolean
+  :group 'indent-hints)
+
+(defcustom indent-hints-tab-width 4
+  "When non-nil, the tab-width to use when the tab-loving profile
+is enabled."
+  :type 'integer
+  :group 'indent-hints)
+
+(defcustom indent-hints-c-basic-offset 4
+  "When non-nil, the c-basic-offset to use when the space-loving
+profile is enabled."
+  :type 'integer
+  :group 'indent-hints)
+
+(defcustom indent-hints-c-default-style "bsd"
+  "When non-nil, the c-default-style to use when the space-loving
+  profile is enabled."
+  :type 'string
+  :group 'indent-hints)
+
+(defvar indent-hints-mode-tab-loving-hook nil
+  "Function(s) to call after detecting a tab-loving buffer")
+
+(defvar indent-hints-mode-space-loving-hook nil
+  "Function(s) to call after detecting a space-loving buffer")
 
 (define-minor-mode indent-hints-mode
   "Give user hints about whether this buffer is space- or tab-loving."
   nil "" nil
   (if indent-hints-mode
-      (let* ((vals (count-line-beginnings))
+      (let* ((vals (ih/count-line-beginnings))
              (begin-with-tab (nth 0 vals))
              (begin-with-space (nth 1 vals))
              (begin-with-something-else (nth 2 vals)))
@@ -93,26 +139,52 @@
                  (/ (float begin-with-space) (+ begin-with-space begin-with-tab))))
             (setq space-loving t)
             (setq tab-loving nil)
-            (update-space-loving-ratio space-ratio)))
+            (ih/update-space-loving-ratio space-ratio)
+            (if indent-hints-enable-profile-switching-enabled
+                (ih/activate-space-loving-profile))
+            (run-hooks 'indent-hints-mode-space-loving-hook)))
          ;; tab-loving
          (t
           (let ((tab-ratio
                  (/ (float begin-with-tab) (+ begin-with-space begin-with-tab))))
             (setq tab-loving t)
             (setq space-loving nil)
-            (update-tab-loving-ratio tab-ratio))))) ; eo let,t,cond,let*
+            (ih/update-tab-loving-ratio tab-ratio)
+            (if indent-hints-enable-profile-switching-enabled
+                (ih/activate-tab-loving-profile))
+            (run-hooks 'indent-hints-mode-tab-loving-hook))))) ; eo let,t,cond,let*
     ;; else, the mode was disabled:
     (progn
       (setq space-loving nil tab-loving nil)
       (message "indent-hints-mode disabled!"))))
 
 
+;;; Profile switching functions
+;;
+
+(defun ih/activate-space-loving-profile ()
+  "Activate the space-loving profile"
+  (interactive)
+  (message "Activating indent-hints space profile")
+  (setq indent-tabs-mode nil)
+  (if indent-hints-c-basic-offset
+	  (setq c-basic-offset indent-hints-c-basic-offset))
+  (if indent-hints-c-default-style
+	  (setq c-default-style indent-hints-c-default-style)))
+
+(defun ih/activate-tab-loving-profile ()
+  "Activate the tab-loving profile"
+  (interactive)
+  (message "Activating indent-hints tab profile")
+  (setq indent-tabs-mode t)
+  (if tab-width indent-hints-tab-width
+    (setq tab-width indent-hints-tab-width)))
+
 
 ;;; Helper functions
 ;;
 
-
-(defun count-line-beginnings ()
+(defun ih/count-line-beginnings ()
   "The real meat. Examine the first character of each line in the
 buffer. This can be used to determine if a buffer is space-loving
 or tab-loving. Returns a list of the
@@ -156,20 +228,20 @@ num-beginning-with-something-else)"
   (make-variable-buffer-local 'neither-loving)
   (setq indent-hints-did-global-activation t))
 
-(setq love-sep ":")
+(setq ih/love-sep ":")
 
-(defun update-space-loving-ratio (ratio)
+(defun ih/update-space-loving-ratio (ratio)
   "Update the of space-loving-ness shown in the mode line"
   (interactive)
-  (let ((newval (concat " Space-loving" love-sep (format "%.2f" ratio))))
+  (let ((newval (concat " Space-loving" ih/love-sep (format "%.2f" ratio))))
        (setq minor-mode-alist
              (cons (list 'space-loving newval)
                    (assq-delete-all 'space-loving minor-mode-alist)))))
 
-(defun update-tab-loving-ratio (ratio)
+(defun ih/update-tab-loving-ratio (ratio)
   "Update the of tab-loving-ness shown in the mode line"
   (interactive)
-  (let ((newval (concat " Tab-loving" love-sep (format "%.2f" ratio))))
+  (let ((newval (concat " Tab-loving" ih/love-sep (format "%.2f" ratio))))
        (setq minor-mode-alist
              (cons (list 'tab-loving newval)
                    (assq-delete-all 'tab-loving minor-mode-alist)))))
@@ -181,11 +253,11 @@ This function is intended to be used with define-globalized-minor-mode"
   (unless (or
            indent-hints-mode
            (minibufferp)
-           (is-temp-buffer (buffer-name))
+           (ih/is-temp-buffer (buffer-name))
            (not (buffer-live-p (current-buffer))))
     (indent-hints-mode 1)))
 
-(defun is-temp-buffer (the-buffer-name)
+(defun ih/is-temp-buffer (the-buffer-name)
   "Returns true if given buffer name is a temp buffer (starts with \" *\")"
   (string= (substring (car (split-string the-buffer-name)) 0 1) "*"))
 
