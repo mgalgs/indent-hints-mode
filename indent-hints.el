@@ -49,9 +49,9 @@
 ;;   automatically when a buffer is detected to be tab-loving or
 ;;   space-loving. To enable this functionality, you should customize
 ;;   the `indent-hints-mode` group and enable
-;;   indent-hints-enable-profile-switching-enabled, or add to your .emacs:
+;;   indent-hints-profile-switching-enabled, or add to your .emacs:
 ;;
-;;`     (setq indent-hints-enable-profile-switching-enabled t)
+;;`     (setq indent-hints-profile-switching-enabled t)
 ;;
 ;; o You can also add your own custom functions to the hooks
 ;;   `indent-hints-mode-tab-loving-hook` and
@@ -84,7 +84,7 @@
 ;;                (string :tag "c-default-style" :value "bsd"))
 ;;   :group 'indent-hints)
 
-(defcustom indent-hints-enable-profile-switching-enabled nil
+(defcustom indent-hints-profile-switching-enabled nil
   "Non-nil means switch between spacing profiles depending on the
   tab- or space-lovingness of buffers"
   :type 'boolean
@@ -140,7 +140,7 @@ profile is enabled."
             (setq space-loving t)
             (setq tab-loving nil)
             (ih/update-space-loving-ratio space-ratio)
-            (if indent-hints-enable-profile-switching-enabled
+            (if indent-hints-profile-switching-enabled
                 (ih/activate-space-loving-profile))
             (run-hooks 'indent-hints-mode-space-loving-hook)))
          ;; tab-loving
@@ -150,7 +150,7 @@ profile is enabled."
             (setq tab-loving t)
             (setq space-loving nil)
             (ih/update-tab-loving-ratio tab-ratio)
-            (if indent-hints-enable-profile-switching-enabled
+            (if indent-hints-profile-switching-enabled
                 (ih/activate-tab-loving-profile))
             (run-hooks 'indent-hints-mode-tab-loving-hook))))) ; eo let,t,cond,let*
     ;; else, the mode was disabled:
