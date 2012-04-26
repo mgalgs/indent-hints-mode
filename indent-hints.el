@@ -114,6 +114,9 @@ profile is enabled."
 (defvar indent-hints-mode-space-loving-hook nil
   "Function(s) to call after detecting a space-loving buffer")
 
+(defvar indent-hints-mode-quiet-mode t
+  "Set to nil to allow indent hints mode to print stuff about what it's doing")
+
 (define-minor-mode indent-hints-mode
   "Give user hints about whether this buffer is space- or tab-loving."
   nil "" nil
@@ -122,7 +125,7 @@ profile is enabled."
              (begin-with-tab (nth 0 vals))
              (begin-with-space (nth 1 vals))
              (begin-with-something-else (nth 2 vals)))
-        (message "%s: %d lines, %d start with tabs, %d start with spaces"
+        (ih/message "%s: %d lines, %d start with tabs, %d start with spaces"
                  (buffer-name)
                  (+ begin-with-something-else begin-with-tab begin-with-space)
                  begin-with-tab
@@ -156,7 +159,7 @@ profile is enabled."
     ;; else, the mode was disabled:
     (progn
       (setq space-loving nil tab-loving nil)
-      (message "indent-hints-mode disabled!"))))
+      (ih/message "indent-hints-mode disabled!"))))
 
 
 ;;; Profile switching functions
@@ -165,7 +168,7 @@ profile is enabled."
 (defun ih/activate-space-loving-profile ()
   "Activate the space-loving profile"
   (interactive)
-  (message "Activating indent-hints space profile")
+  (ih/message "Activating indent-hints space profile")
   (setq indent-tabs-mode nil)
   (if indent-hints-c-basic-offset
 	  (setq c-basic-offset indent-hints-c-basic-offset))
@@ -175,7 +178,7 @@ profile is enabled."
 (defun ih/activate-tab-loving-profile ()
   "Activate the tab-loving profile"
   (interactive)
-  (message "Activating indent-hints tab profile")
+  (ih/message "Activating indent-hints tab profile")
   (setq indent-tabs-mode t)
   (if tab-width indent-hints-tab-width
     (setq tab-width indent-hints-tab-width)))
@@ -183,6 +186,11 @@ profile is enabled."
 
 ;;; Helper functions
 ;;
+
+(defun ih/message (format-string &rest args)
+  (interactive)
+  (unless indent-hints-mode-quiet-mode
+    (apply 'message format-string args)))
 
 (defun ih/count-line-beginnings ()
   "The real meat. Examine the first character of each line in the
@@ -217,7 +225,7 @@ num-beginning-with-something-else)"
 
 (defun indent-hints-global-activate ()
   "Sets up the minor-mode-alist and buffer-local variable for indentation hints"
-  (message "doing global-activate globact: %S" indent-hints-did-global-activation)
+  (ih/message "doing global-activate globact: %S" indent-hints-did-global-activation)
   (setq minor-mode-alist (cons '(space-loving " Space-loving")
                                (cons '(tab-loving " Tab-loving")
                                      (cons '(neither-loving " Neither-loving")
