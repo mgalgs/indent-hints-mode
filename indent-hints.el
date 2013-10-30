@@ -37,13 +37,13 @@
 ;; o For the impatient, here's a quick setup example (after putting
 ;;   indent-hints.el in your load path):
 ;;
-;;`     (require 'indent-hints)
-;;`     (indent-hints-global-mode)
+;;     (require 'indent-hints)
+;;     (indent-hints-global-mode)
 ;;
 ;;   You should probably at least customize the indent-hints-mode
 ;;   group to use your preferred space/tabs setup, like so:
 ;;
-;;`     M-x customize-group [RET] indent-hints [RET]
+;;     M-x customize-group [RET] indent-hints [RET]
 ;;
 ;; o You can set up some "whitespace profiles" that get selected
 ;;   automatically when a buffer is detected to be tab-loving or
@@ -51,7 +51,7 @@
 ;;   the `indent-hints-mode` group and enable
 ;;   indent-hints-profile-switching-enabled, or add to your .emacs:
 ;;
-;;`     (setq indent-hints-profile-switching-enabled t)
+;;     (setq indent-hints-profile-switching-enabled t)
 ;;
 ;; o You can also add your own custom functions to the hooks
 ;;   `indent-hints-mode-tab-loving-hook` and
@@ -65,7 +65,7 @@
 ;; space-to-tab (or tab-to-space, whichever your buffer loves)
 ;; loving-ness that your current buffer exudes. Here's a "screenshot":
 ;;
-;;`     test.el Top -- (Emacs-Lisp Tab-loving:0.53 yas pair)--etc. etc.--
+;;     test.el Top -- (Emacs-Lisp \t:0.53 yas pair)--etc. etc.--
 ;;
 ;; The file being visited in the "screenshot" has more tabs than
 ;; spaces (53% of the lines that start with some sort of indentation
@@ -223,12 +223,21 @@ num-beginning-with-something-else)"
 ;; activation of indent-hints-mode:
 (setq indent-hints-did-global-activation nil)
 
+(defcustom indent-hints-space-loving-modeline-indicator " \" \""
+  "Modeline indicator to use when the file is space-loving")
+
+(defcustom indent-hints-tab-loving-modeline-indicator " \\t"
+  "Modeline indicator to use when the file is tab-loving")
+
+(defcustom indent-hints-neither-loving-modeline-indicator ""
+  "Modeline indicator to use when the file is neither-loving")
+
 (defun indent-hints-global-activate ()
   "Sets up the minor-mode-alist and buffer-local variable for indentation hints"
   (ih/message "doing global-activate globact: %S" indent-hints-did-global-activation)
-  (setq minor-mode-alist (cons '(space-loving " Space-loving")
-                               (cons '(tab-loving " Tab-loving")
-                                     (cons '(neither-loving " Neither-loving")
+  (setq minor-mode-alist (cons '(space-loving indent-hints-space-loving-modeline-indicator)
+                               (cons '(tab-loving indent-hints-tab-loving-modeline-indicator)
+                                     (cons '(neither-loving indent-hints-neither-loving-modeline-indicator)
                                            minor-mode-alist))))
   (setq space-loving nil tab-loving nil neither-loving nil)
   (make-variable-buffer-local 'space-loving)
@@ -241,7 +250,7 @@ num-beginning-with-something-else)"
 (defun ih/update-space-loving-ratio (ratio)
   "Update the of space-loving-ness shown in the mode line"
   (interactive)
-  (let ((newval (concat " Space-loving" ih/love-sep (format "%.2f" ratio))))
+  (let ((newval (concat indent-hints-space-loving-modeline-indicator ih/love-sep (format "%.2f" ratio))))
        (setq minor-mode-alist
              (cons (list 'space-loving newval)
                    (assq-delete-all 'space-loving minor-mode-alist)))))
@@ -249,7 +258,7 @@ num-beginning-with-something-else)"
 (defun ih/update-tab-loving-ratio (ratio)
   "Update the of tab-loving-ness shown in the mode line"
   (interactive)
-  (let ((newval (concat " Tab-loving" ih/love-sep (format "%.2f" ratio))))
+  (let ((newval (concat indent-hints-tab-loving-modeline-indicator ih/love-sep (format "%.2f" ratio))))
        (setq minor-mode-alist
              (cons (list 'tab-loving newval)
                    (assq-delete-all 'tab-loving minor-mode-alist)))))
