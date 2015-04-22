@@ -206,7 +206,9 @@ num-beginning-with-something-else)"
           (current-line-number 1))
       (goto-char 1)
       (while (char-after (point))
-        (cond ((= 32 (char-after (point)))
+        (cond ((nth 4 (syntax-ppss)) ;; don't count comments against either one
+               (setq begin-with-something-else (1+ begin-with-something-else)))
+              ((= 32 (char-after (point)))
                (setq begin-with-space (1+ begin-with-space)))
               ((= 9 (char-after (point)))
                (setq begin-with-tab (1+ begin-with-tab)))
