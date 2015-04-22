@@ -214,12 +214,8 @@ num-beginning-with-something-else)"
                (setq begin-with-tab (1+ begin-with-tab)))
               (t (setq begin-with-something-else (1+ begin-with-something-else))))
         (setq current-line-number (1+ current-line-number))
-        (forward-line 1)
-        ) ;; eo while
-      (list begin-with-tab begin-with-space begin-with-something-else)
-      ) ;; eo let
-    ) ;; eo save-excursion
-  ) ;; eo defun
+        (forward-line 1))
+      (list begin-with-tab begin-with-space begin-with-something-else))))
 
 ;; global variable to keep track of whether or not we've done global
 ;; activation of indent-hints-mode:
