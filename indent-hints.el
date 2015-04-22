@@ -114,7 +114,7 @@ profile is enabled."
 (defvar indent-hints-mode-space-loving-hook nil
   "Function(s) to call after detecting a space-loving buffer")
 
-(defvar indent-hints-mode-quiet-mode t
+(defvar indent-hints-mode-quiet-mode nil
   "Set to nil to allow indent hints mode to print stuff about what it's doing")
 
 (define-minor-mode indent-hints-mode
