@@ -170,10 +170,11 @@ profile is enabled."
   (interactive)
   (ih/message "Activating indent-hints space profile")
   (setq indent-tabs-mode nil)
-  (if indent-hints-c-basic-offset
-	  (setq c-basic-offset indent-hints-c-basic-offset))
-  (if indent-hints-c-default-style
-	  (setq c-default-style indent-hints-c-default-style)))
+  (when indent-hints-c-basic-offset
+    (setq c-basic-offset indent-hints-c-basic-offset)
+    (setq tab-width indent-hints-c-basic-offset))
+  (when indent-hints-c-default-style
+    (setq c-default-style indent-hints-c-default-style)))
 
 (defun ih/activate-tab-loving-profile ()
   "Activate the tab-loving profile"
