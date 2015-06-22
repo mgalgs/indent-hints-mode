@@ -124,12 +124,16 @@ profile is enabled."
       (let* ((vals (ih/count-line-beginnings))
              (begin-with-tab (nth 0 vals))
              (begin-with-space (nth 1 vals))
-             (begin-with-something-else (nth 2 vals)))
-        (ih/message "%s: %d lines, %d start with tabs, %d start with spaces"
-                 (buffer-name)
-                 (+ begin-with-something-else begin-with-tab begin-with-space)
-                 begin-with-tab
-                 begin-with-space)
+             (begin-with-something-else (nth 2 vals))
+             (total-lines (+ begin-with-something-else begin-with-tab begin-with-space)))
+        (ih/message "%s: %s%d lines, %d start with tabs, %d start with spaces"
+                    (buffer-name)
+                    (if (>= total-lines ih/max-lines-to-examine)
+                        "At least "
+                      "")
+                    total-lines
+                    begin-with-tab
+                    begin-with-space)
         (cond
          ;; no tabs or spaces
          ((and (= 0 begin-with-tab) (= 0 begin-with-space))
@@ -193,6 +197,10 @@ profile is enabled."
   (unless indent-hints-mode-quiet-mode
     (apply 'message format-string args)))
 
+(defvar ih/max-lines-to-examine 10000
+  "Max number of lines to look at when trying to decide whether
+the buffer is space- or tab-loving.")
+
 (defun ih/count-line-beginnings ()
   "The real meat. Examine the first character of each line in the
 buffer. This can be used to determine if a buffer is space-loving
@@ -206,7 +214,8 @@ num-beginning-with-something-else)"
           (begin-with-something-else 0)
           (current-line-number 1))
       (goto-char 1)
-      (while (char-after (point))
+      (while (and (char-after (point))
+                  (<= current-line-number ih/max-lines-to-examine))
         (cond ((nth 4 (syntax-ppss)) ;; don't count comments against either one
                (setq begin-with-something-else (1+ begin-with-something-else)))
               ((= 32 (char-after (point)))
