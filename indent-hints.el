@@ -37,13 +37,13 @@
 ;; o For the impatient, here's a quick setup example (after putting
 ;;   indent-hints.el in your load path):
 ;;
-;;     (require 'indent-hints)
-;;     (indent-hints-global-mode)
+;;         (require 'indent-hints)
+;;         (indent-hints-global-mode)
 ;;
 ;;   You should probably at least customize the indent-hints-mode
 ;;   group to use your preferred space/tabs setup, like so:
 ;;
-;;     M-x customize-group [RET] indent-hints [RET]
+;;         M-x customize-group [RET] indent-hints [RET]
 ;;
 ;; o You can set up some "whitespace profiles" that get selected
 ;;   automatically when a buffer is detected to be tab-loving or
@@ -51,7 +51,7 @@
 ;;   the `indent-hints-mode` group and enable
 ;;   indent-hints-profile-switching-enabled, or add to your .emacs:
 ;;
-;;     (setq indent-hints-profile-switching-enabled t)
+;;         (setq indent-hints-profile-switching-enabled t)
 ;;
 ;; o You can also add your own custom functions to the hooks
 ;;   `indent-hints-mode-tab-loving-hook` and
