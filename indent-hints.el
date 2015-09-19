@@ -38,7 +38,7 @@
 ;;   indent-hints.el in your load path):
 ;;
 ;;         (require 'indent-hints)
-;;         (indent-hints-global-mode)
+;;         (add-hook 'c-mode-common-hook 'indent-hints-activate)
 ;;
 ;;   You should probably at least customize the indent-hints-mode
 ;;   group to use your preferred space/tabs setup, like so:
@@ -251,7 +251,7 @@ num-beginning-with-something-else)"
 (defcustom indent-hints-neither-loving-modeline-indicator ""
   "Modeline indicator to use when the file is neither-loving")
 
-(defun indent-hints-global-activate ()
+(defun indent-hints--init ()
   "Sets up the minor-mode-alist and buffer-local variable for indentation hints"
   (ih/message "doing global-activate globact: %S" indent-hints-did-global-activation)
   (setq minor-mode-alist (cons '(space-loving indent-hints-space-loving-modeline-indicator)
@@ -303,9 +303,7 @@ This function is intended to be used with define-globalized-minor-mode"
   "Returns true if given buffer name is a temp buffer (starts with \" *\")"
   (string= (substring (car (split-string the-buffer-name)) 0 1) "*"))
 
-(define-globalized-minor-mode indent-hints-global-mode indent-hints-mode indent-hints-mode-on
-  :group 'indent-hints
-  :require 'indent-hints)
+(indent-hints--init)
 
 (provide 'indent-hints)
 ;;; indent-hints.el ends here
