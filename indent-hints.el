@@ -82,13 +82,6 @@
   "Indent Hints Group"
   :group 'convenience)
 
-;; (defcustom indent-hints-tab-loving-space-profile nil
-;;   "The profile to activate when a space-loving buffer is detected"
-;;   :type '(list :tag "How to set up spacees"
-;;                (integer :tag "c-basic-offset" :value 4)
-;;                (string :tag "c-default-style" :value "bsd"))
-;;   :group 'indent-hints)
-
 (defcustom indent-hints-profile-switching-enabled nil
   "Non-nil means switch between spacing profiles depending on the
   tab- or space-lovingness of buffers"
@@ -172,9 +165,8 @@ Example: '(\"linux)")
                 (ih/activate-tab-loving-profile))
             (run-hooks 'indent-hints-mode-tab-loving-hook))))) ; eo let,t,cond,let*
     ;; else, the mode was disabled:
-    (progn
-      (setq space-loving nil tab-loving nil)
-      (ih/message "indent-hints-mode disabled!"))))
+    (setq space-loving nil tab-loving nil)
+    (ih/message "indent-hints-mode disabled!")))
 
 
 ;;; Profile switching functions
