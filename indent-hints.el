@@ -1,11 +1,11 @@
 ;;; indent-hints.el --- Get some hints about whether your buffer is
 ;;; space- or tab-loving
 
-;; Copyright (C) 2011, Mitchel Humpherys
+;; Copyright (C) 2011-2015, Mitchel Humpherys
 
 ;; Author: Mitchel Humpherys <mitch.special@gmail.com>
 ;; Keywords: convenience
-;; Version: 0.1
+;; Version: 0.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -58,6 +58,11 @@
 ;;   `indent-hints-mode-space-loving-hook` which run after a buffer is
 ;;   detected to be tab-loving or space-loving, respectively.
 ;;
+;; o To disable profile switching for a particular C style, add the style
+;;   name to `indent-hints-ignore-c-styles`, for example:
+;;
+;;         (setq indent-hints-ignore-c-styles '("linux"))
+;;
 ;;; Use:
 ;;
 ;; Just check out your mode-line to see whether the buffer you're
@@ -107,6 +112,12 @@ profile is enabled."
   profile is enabled."
   :type 'string
   :group 'indent-hints)
+
+(defvar indent-hints-ignore-c-styles nil
+  "List of C style names (from `c-style-alist') that should be
+ignored for profile switching.
+
+Example: '(\"linux)")
 
 (defvar indent-hints-mode-tab-loving-hook nil
   "Function(s) to call after detecting a tab-loving buffer")
@@ -270,6 +281,12 @@ num-beginning-with-something-else)"
        (setq minor-mode-alist
              (cons (list 'tab-loving newval)
                    (assq-delete-all 'tab-loving minor-mode-alist)))))
+
+(defun indent-hints-activate ()
+  "Activate indent-hints minor mode for this buffer, if
+appropriate."
+  (unless (member c-indentation-style indent-hints-ignore-c-styles)
+    (indent-hints-mode 1)))
 
 (defun indent-hints-mode-on ()
   "Turns on indent-hints-mode, if appropriate.

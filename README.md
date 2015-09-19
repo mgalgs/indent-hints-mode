@@ -20,7 +20,7 @@ indentation. That's the idea.
   indent-hints.el in your load path):
 
         (require 'indent-hints)
-        (indent-hints-global-mode)
+        (add-hook 'c-mode-common-hook 'indent-hints-activate)
 
   You should probably at least customize the indent-hints-mode
   group to use your preferred space/tabs setup, like so:
@@ -39,6 +39,11 @@ indentation. That's the idea.
   `indent-hints-mode-tab-loving-hook` and
   `indent-hints-mode-space-loving-hook` which run after a buffer is
   detected to be tab-loving or space-loving, respectively.
+
+* To disable profile switching for a particular C style, add the style
+  name to `indent-hints-ignore-c-styles`, for example:
+
+        (setq indent-hints-ignore-c-styles '("linux"))
 
 ### Use
 
@@ -73,10 +78,6 @@ or tab-loving. Returns a list of the
 form: (num-beginning-with-tab num-beginning-with-space
 num-beginning-with-something-else)
 
-#### `(indent-hints-global-activate)`
-
-Sets up the minor-mode-alist and buffer-local variable for indentation hints
-
 #### `(ih/update-space-loving-ratio RATIO)`
 
 Update the of space-loving-ness shown in the mode line
@@ -84,6 +85,11 @@ Update the of space-loving-ness shown in the mode line
 #### `(ih/update-tab-loving-ratio RATIO)`
 
 Update the of tab-loving-ness shown in the mode line
+
+#### `(indent-hints-activate)`
+
+Activate indent-hints minor mode for this buffer, if
+appropriate.
 
 #### `(indent-hints-mode-on)`
 
