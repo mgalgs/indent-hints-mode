@@ -100,8 +100,14 @@ profile is enabled."
   :type 'integer
   :group 'indent-hints)
 
-(defcustom indent-hints-c-default-style "bsd"
+(defcustom indent-hints-c-default-space-loving-style "bsd"
   "When non-nil, the c-default-style to use when the space-loving
+  profile is enabled."
+  :type 'string
+  :group 'indent-hints)
+
+(defcustom indent-hints-c-default-tab-loving-style "linux"
+  "When non-nil, the c-default-style to use when the tab-loving
   profile is enabled."
   :type 'string
   :group 'indent-hints)
@@ -180,8 +186,8 @@ Example: '(\"linux)")
   (when indent-hints-c-basic-offset
     (setq c-basic-offset indent-hints-c-basic-offset)
     (setq tab-width indent-hints-c-basic-offset))
-  (when indent-hints-c-default-style
-    (setq c-default-style indent-hints-c-default-style)))
+  (when indent-hints-c-default-space-loving-style
+    (setq c-default-style indent-hints-c-default-space-loving-style)))
 
 (defun ih/activate-tab-loving-profile ()
   "Activate the tab-loving profile"
@@ -189,7 +195,9 @@ Example: '(\"linux)")
   (ih/message "Activating indent-hints tab profile")
   (setq indent-tabs-mode t)
   (if tab-width indent-hints-tab-width
-    (setq tab-width indent-hints-tab-width)))
+    (setq tab-width indent-hints-tab-width))
+  (when indent-hints-c-default-tab-loving-style
+    (setq c-default-style indent-hints-c-default-tab-loving-style)))
 
 
 ;;; Helper functions
