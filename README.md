@@ -2,6 +2,7 @@
 *Get some hints about whether your buffer is space- or tab-loving*
 
 ---
+[![License GPLv3](https://img.shields.io/badge/license-GPL_v3-green.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 
 As the Eternal Holy War of tabs-versus-spaces rages on, even within
 individual projects, an emacs minor mode arises from the depths of
