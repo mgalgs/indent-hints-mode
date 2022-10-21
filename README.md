@@ -1,3 +1,4 @@
+<a href="https://github.com/mgalgs/indent-hints-mode"><img src="https://www.gnu.org/software/emacs/images/emacs.png" alt="Emacs Logo" width="80" height="80" align="right"></a>
 ## indent-hints.el
 *Get some hints about whether your buffer is space- or tab-loving*
 
@@ -60,8 +61,48 @@ The file being visited in the "screenshot" has more tabs than
 spaces (53% of the lines that start with some sort of indentation
 start with tabs, to be exact).
 
-### Function Documentation
 
+
+### Customization Documentation
+
+#### `indent-hints-profile-switching-enabled`
+
+Non-nil means switch between spacing profiles depending on the
+  tab- or space-lovingness of buffers
+
+#### `indent-hints-tab-width`
+
+When non-nil, the tab-width to use when the tab-loving profile
+is enabled.
+
+#### `indent-hints-c-basic-offset`
+
+When non-nil, the c-basic-offset to use when the space-loving
+profile is enabled.
+
+#### `indent-hints-c-default-space-loving-style`
+
+When non-nil, the c-default-style to use when the space-loving
+  profile is enabled.
+
+#### `indent-hints-c-default-tab-loving-style`
+
+When non-nil, the c-default-style to use when the tab-loving
+  profile is enabled.
+
+#### `indent-hints-space-loving-modeline-indicator`
+
+Modeline indicator to use when the file is space-loving
+
+#### `indent-hints-tab-loving-modeline-indicator`
+
+Modeline indicator to use when the file is tab-loving
+
+#### `indent-hints-neither-loving-modeline-indicator`
+
+Modeline indicator to use when the file is neither-loving
+
+### Function and Macro Documentation
 
 #### `(ih/activate-space-loving-profile)`
 
